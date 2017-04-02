@@ -75,6 +75,8 @@ public:
 
 	void SetVolume(u32 volume);
 
+	static SoundDriverInterface* CreateSoundDriver() { return new XAudio2SoundDriver(); }
+
 protected:
 
 	bool dllInitialized;

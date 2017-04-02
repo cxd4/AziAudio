@@ -1,37 +1,34 @@
 #include "SoundDriverFactory.h"
-#if defined(_WIN32)
-#include "DirectSoundDriver.h"
-#include "XAudio2SoundDriver.h"
-#include "DirectSoundDriverLegacy.h"
-#include "XAudio2SoundDriverLegacy.h"
-#else
-#include "SDLSoundDriver.h"
-#endif
 #include "NoSoundDriver.h"
+
+int SoundDriverFactory::FactoryNextSlot = 0;
+SoundDriverFactory::FactoryDriversStruct SoundDriverFactory::FactoryDrivers[MAX_FACTORY_DRIVERS];
 
 SoundDriverInterface* SoundDriverFactory::CreateSoundDriver(SoundDriverType DriverID)
 {
 	SoundDriverInterface *result = NULL;
-	switch (DriverID)
+	for (int x = 0; x < FactoryNextSlot; x++)
 	{
-		case SND_DRIVER_DS8L :
-			result = new DirectSoundDriverLegacy();
+		if (FactoryDrivers[x].DriverType == DriverID)
+		{
+			result = FactoryDrivers[x].CreateFunction();
 			break;
-		case SND_DRIVER_DS8:
-			result = new DirectSoundDriver();
-			break;
-		case SND_DRIVER_XA2L:
-			result = new XAudio2SoundDriverLegacy();
-			break;
-		case SND_DRIVER_XA2:
-			result = new XAudio2SoundDriver();
-			break;
-		case SND_DRIVER_NOSOUND:
-			result = new NoSoundDriver();
-			break;
-		default:
-			result = new NoSoundDriver();
+		}
 	}
+	if (result == NULL)
+		result = new NoSoundDriver();
 
 	return result;
+}
+
+bool SoundDriverFactory::RegisterSoundDriver(SoundDriverType DriverType, SoundDriverCreationFunction CreateFunction)
+{
+	if (FactoryNextSlot < MAX_FACTORY_DRIVERS)
+	{
+		FactoryDrivers[FactoryNextSlot].DriverType = DriverType;
+		FactoryDrivers[FactoryNextSlot].CreateFunction = CreateFunction;
+		FactoryNextSlot++;
+		return true;
+	}
+	return false;
 }

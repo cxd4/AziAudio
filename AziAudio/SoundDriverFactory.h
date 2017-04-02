@@ -13,12 +13,23 @@ enum SoundDriverType
 
 class SoundDriverFactory
 {
+private:
+	typedef SoundDriverInterface* (*SoundDriverCreationFunction)();
+	struct FactoryDriversStruct
+	{
+		SoundDriverType DriverType;
+		SoundDriverCreationFunction CreateFunction;
+	};
 
 private:
 	SoundDriverFactory() {};
+	static int FactoryNextSlot;
+	static const int MAX_FACTORY_DRIVERS = 20;
+	static FactoryDriversStruct FactoryDrivers[MAX_FACTORY_DRIVERS];
 public:
 	~SoundDriverFactory() {};
 
 	static SoundDriverInterface* CreateSoundDriver(SoundDriverType DriverID);
+	static bool RegisterSoundDriver(SoundDriverType DriverType, SoundDriverCreationFunction CreateFunction);
 };
 

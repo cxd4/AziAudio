@@ -76,6 +76,8 @@ public:
 
 	//void PlayBuffer(int bufferNumber, u8* bufferData, int bufferSize);
 
+	static SoundDriverInterface* CreateSoundDriver() { return new XAudio2SoundDriverLegacy(); }
+
 protected:
 
 	bool dllInitialized;

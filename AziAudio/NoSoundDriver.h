@@ -49,6 +49,9 @@ public:
 	void StartAudio();
 	void SetFrequency(u32 Frequency);
 
+	static SoundDriverInterface* CreateSoundDriver() { return new NoSoundDriver(); }
+
+
 protected:
 	bool dllInitialized;
 	/*

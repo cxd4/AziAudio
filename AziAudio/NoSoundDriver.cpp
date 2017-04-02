@@ -2,6 +2,9 @@
 	NoSound Driver to demonstrate how to use the SoundDriver interface
 */
 #include "NoSoundDriver.h"
+#include "SoundDriverFactory.h"
+
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_NOSOUND, NoSoundDriver::CreateSoundDriver);
 
 Boolean NoSoundDriver::Initialize()
 {

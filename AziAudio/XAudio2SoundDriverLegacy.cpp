@@ -13,6 +13,9 @@
 #include "XAudio2SoundDriverLegacy.h"
 #include "AudioSpec.h"
 #include <stdio.h>
+#include "SoundDriverFactory.h"
+
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2L, XAudio2SoundDriverLegacy::CreateSoundDriver);
 
 static IXAudio2* g_engine;
 static IXAudio2SourceVoice* g_source;

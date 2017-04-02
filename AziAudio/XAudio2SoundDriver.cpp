@@ -13,6 +13,9 @@
 #include "XAudio2SoundDriver.h"
 #include "AudioSpec.h"
 #include <stdio.h>
+#include "SoundDriverFactory.h"
+
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2, XAudio2SoundDriver::CreateSoundDriver);
 
 static IXAudio2* g_engine;
 static IXAudio2SourceVoice* g_source;
@@ -184,7 +187,7 @@ void XAudio2SoundDriver::PlayBuffer(u8* bufferData, int bufferSize)
 	XAUDIO2_VOICE_STATE xvs;
 	g_source->GetState(&xvs);
 
-	assert(xvs.BuffersQueued < 4);
+	assert(xvs.BuffersQueued < 5);
 
 }
 
@@ -219,7 +222,7 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 			// # of BuffersQueued is a knob we can turn for latency vs buffering
 			// 2 is minimum.  Maximum is the size of bufferData which is still TBD (Current 5)
 			// It is always possible to new a buffer prior to submission then free it on completion.  Worth it?
-			while (xvs.BuffersQueued < 2) 
+			while (xvs.BuffersQueued < 4) // Doubled this in hopes it would help... shouldn't cause too much additional latency
 			{
 				u32 len = driver->LoadAiBuffer(bufferData[idx], cacheSize);
 				if (len > 0)
@@ -229,7 +232,7 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 				}
 				else
 				{
-					Sleep(1);
+					Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
 				}
 				g_source->GetState(&xvs);
 			}

@@ -14,6 +14,9 @@
 #include "DirectSoundDriverLegacy.h"
 #include "AudioSpec.h"
 //#include "WaveOut.h"
+#include "SoundDriverFactory.h"
+
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_DS8L, DirectSoundDriverLegacy::CreateSoundDriver);
 
 // TODO: Clean this up a bit...
 

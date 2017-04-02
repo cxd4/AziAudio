@@ -83,4 +83,6 @@ public:
 
 	void SetVolume(u32 volume);
 
+	static SoundDriverInterface* CreateSoundDriver() { return new DirectSoundDriverLegacy(); }
+
 };
