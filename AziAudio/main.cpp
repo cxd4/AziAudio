@@ -25,9 +25,8 @@
 	#include <io.h>
 	#include <fcntl.h>
 	#include <ios>
+	using namespace std;
 #endif
-
-using namespace std;
 
 SoundDriverInterface *snd = NULL;
 

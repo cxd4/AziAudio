@@ -43,7 +43,7 @@ static DWORD interruptcnt = 0;
 
 DWORD WINAPI AudioThreadProc(DirectSoundDriver *ac) {
 	DWORD dwStatus;
-	DWORD last_play_pos = 0, bytesMoved = 0;
+	//DWORD last_play_pos = 0, bytesMoved = 0;
 	//LPDIRECTSOUNDBUFFER8  lpdsbuf = ac->lpdsbuf;
 //	LPDIRECTSOUND8        lpds = ac->lpds;
 

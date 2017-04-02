@@ -88,7 +88,7 @@ unsigned long GenerateCRC (unsigned char *data, int size);
 #endif
 #else
 #ifdef _DEBUG
-#define PLUGIN_DEBUG " (Debug r20)"
+#define PLUGIN_DEBUG " (Debug r22)"
 #else
 #define PLUGIN_DEBUG ""
 #endif
