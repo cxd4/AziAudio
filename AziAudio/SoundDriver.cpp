@@ -20,7 +20,7 @@ void SoundDriver::AI_LenChanged(u8 *start, u32 length)
 		while ((m_BufferRemaining) == m_MaxBufferSize)// ((m_MaxBufferSize / 3) * 2))
 		{
 #ifdef _WIN32
-			Sleep(1);
+			//Sleep(1);
 #else
 			// TODO: We need to support non-windows in another way
 			assert(0);

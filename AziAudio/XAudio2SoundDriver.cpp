@@ -177,7 +177,7 @@ void XAudio2SoundDriver::PlayBuffer(u8* bufferData, int bufferSize)
 	xa2buff.LoopBegin = 0;
 	xa2buff.LoopLength = 0;
 	xa2buff.LoopCount = 0;
-	xa2buff.pContext = NULL;
+	xa2buff.pContext = this;
 	xa2buff.AudioBytes = bufferSize;
 	xa2buff.pAudioData = bufferData;
 	if (canPlay)
@@ -212,7 +212,7 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 	XAudio2SoundDriver* driver = (XAudio2SoundDriver*)lpParameter;
 	HANDLE hEvents[1] = { driver->voiceCallback.hBufferEndEvent };
 	static int idx = 0;  // TODO: This needs to be moved...
-
+	return 0;
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
 	while (driver->bStopAudioThread == false)
@@ -253,6 +253,8 @@ void XAudio2SoundDriver::StartAudioThread()
 		bStopAudioThread = false;
 		hAudioThread = CreateThread(NULL, 0, AudioThreadProc, this, 0, NULL);
 		assert(hAudioThread != NULL);
+		u32 len = LoadAiBuffer(bufferData[0], cacheSize);
+		PlayBuffer(bufferData[0], len);
 	}
 }
 
@@ -303,7 +305,34 @@ void XAudio2SoundDriver::SetVolume(u32 volume)
 void __stdcall VoiceCallback::OnBufferEnd(void * pBufferContext)
 {
 	UNREFERENCED_PARAMETER(pBufferContext);
-	SetEvent(hBufferEndEvent);
+	//SetEvent(hBufferEndEvent);
+	static int idx = 0;  // TODO: This needs to be moved...
+	XAudio2SoundDriver* driver;
+
+	driver = (XAudio2SoundDriver *)pBufferContext;
+	if (g_source != NULL && driver->bStopAudioThread == false)
+	{
+		XAUDIO2_VOICE_STATE xvs;
+		g_source->GetState(&xvs);
+		// # of BuffersQueued is a knob we can turn for latency vs buffering
+		// 2 is minimum.  Maximum is the size of bufferData which is still TBD (Current 5)
+		// It is always possible to new a buffer prior to submission then free it on completion.  Worth it?
+		while (xvs.BuffersQueued < 4) // Doubled this in hopes it would help... shouldn't cause too much additional latency
+		{
+			u32 len = driver->LoadAiBuffer(bufferData[idx], cacheSize);
+			if (len > 0)
+			{
+				driver->PlayBuffer(bufferData[idx], len);
+				idx = (idx + 1) % 4;
+			}
+			else
+			{
+				Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
+			}
+			g_source->GetState(&xvs);
+		}
+	}
+
 }
 
 void __stdcall VoiceCallback::OnVoiceProcessingPassStart(UINT32 SamplesRequired) 

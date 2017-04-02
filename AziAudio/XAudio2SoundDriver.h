@@ -77,6 +77,7 @@ public:
 
 	static SoundDriverInterface* CreateSoundDriver() { return new XAudio2SoundDriver(); }
 
+	bool   bStopAudioThread;
 protected:
 
 	bool dllInitialized;
@@ -85,7 +86,6 @@ protected:
 
 private:
 	HANDLE hAudioThread;
-	bool   bStopAudioThread;
 };
 
 /*
