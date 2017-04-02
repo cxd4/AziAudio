@@ -53,10 +53,10 @@ void Configuration::LoadSettings()
 	file = fopen(ConfigFile, "rb");
 	if (file == NULL)
 	{
-		azicfg[0] = TRUE;
-		azicfg[1] = FALSE;
-		azicfg[2] = TRUE;
-		azicfg[3] = 0; /* 0:  max volume; 100:  min volume */
+		Configuration::configSyncAudio = true;
+		Configuration::configForceSync = false;
+		Configuration::configAIEmulation = true;
+		Configuration::configVolume = 0; /* 0:  max volume; 100:  min volume */
 		SaveSettings(); // Saves the config file with defaults
 	}
 	else
