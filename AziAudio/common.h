@@ -10,12 +10,6 @@
 ****************************************************************************/
 
 //************ Configuration Section ************** (to be moved to compile time defines)
-// Configure the plugin to use XAudio2 -- default DirectSound
-//#ifndef XAUDIO_LIBRARIES_UNAVAILABLE
-//#ifdef _WIN32
-//#define USE_XAUDIO2
-//#endif
-//#endif
 
 // Configure the plugin to have a console window for informational output -- should be used for debugging only
 //#define USE_PRINTF
@@ -94,7 +88,7 @@ unsigned long GenerateCRC (unsigned char *data, int size);
 #endif
 #else
 #ifdef _DEBUG
-#define PLUGIN_DEBUG " (Debug r18)"
+#define PLUGIN_DEBUG " (Debug r20)"
 #else
 #define PLUGIN_DEBUG ""
 #endif

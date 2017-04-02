@@ -431,7 +431,7 @@ BOOL DirectSoundDriverLegacy::Initialize() {
 
 	ReleaseMutex(hMutex);
 
-	SetSegmentSize(LOCK_SIZE);
+//	SetSegmentSize(LOCK_SIZE);
 
 	DEBUG_OUTPUT("DS8L: Init Success...\n");
 
