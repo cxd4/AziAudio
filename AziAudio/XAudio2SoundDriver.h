@@ -21,12 +21,12 @@
 class VoiceCallback : public IXAudio2VoiceCallback
 {
 public:
-	//HANDLE hBufferEndEvent;
-	VoiceCallback() /*: hBufferEndEvent(CreateEvent(NULL, FALSE, FALSE, NULL))*/{}
-	~VoiceCallback(){/* CloseHandle(hBufferEndEvent); */}
+	HANDLE hBufferEndEvent;
+	VoiceCallback() : hBufferEndEvent(CreateEvent(NULL, FALSE, FALSE, NULL)){}
+	~VoiceCallback(){ CloseHandle(hBufferEndEvent); }
 
 	//Called when the voice has just finished playing a contiguous audio stream.
-	void __stdcall OnStreamEnd() {/* SetEvent(hBufferEndEvent); */}
+	void __stdcall OnStreamEnd() { SetEvent(hBufferEndEvent); }
 
 	//Unused methods are stubs
 	
@@ -81,6 +81,7 @@ protected:
 
 	bool dllInitialized;
 	static DWORD WINAPI AudioThreadProc(LPVOID lpParameter);
+	VoiceCallback voiceCallback;
 
 private:
 	HANDLE hAudioThread;

@@ -107,11 +107,11 @@ void Configuration::LoadDefaults()
 	strcpy(Configuration::configDevice, "");
 #endif
 	// TODO: Query the system and get defaults (windows only?)
-	configFrequency = 48000; // Not implemented -- needs testing
-	configBitRate   = 24;    // Not implemented -- needs testing
+	configFrequency = 44100; // Not implemented -- needs testing
+	configBitRate   = 16;    // Not implemented -- needs testing
 	configBufferLevel = 2;  // NewAudio only - How many frames to buffer
-	configBufferFPS = 90;   // NewAudio only - How much data to frame per second
-	configBackendFPS = 90;  // NewAudio only - How much data to frame per second
+	configBufferFPS = 95;   // NewAudio only - How much data to frame per second
+	configBackendFPS = 95;  // NewAudio only - How much data to frame per second
 	LoadSettings();	
 }
 #ifdef _WIN32

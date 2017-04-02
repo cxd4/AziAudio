@@ -33,7 +33,6 @@ static int lastLength = 1;
 
 static int cacheSize = 0;
 static int interrupts = 0;
-static VoiceCallback voiceCallback;
 
 XAudio2SoundDriver::XAudio2SoundDriver()
 {
@@ -211,7 +210,10 @@ void XAudio2SoundDriver::AiUpdate(BOOL Wait)
 DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 {
 	XAudio2SoundDriver* driver = (XAudio2SoundDriver*)lpParameter;
+	HANDLE hEvents[1] = { driver->voiceCallback.hBufferEndEvent };
 	static int idx = 0;  // TODO: This needs to be moved...
+
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
 
 	while (driver->bStopAudioThread == false)
 	{
@@ -237,7 +239,8 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 				g_source->GetState(&xvs);
 			}
 		}
-		Sleep(1);
+		//Sleep(1);
+		WaitForMultipleObjects(1, hEvents, FALSE, 1);
 	}
 	return 0;
 }
@@ -300,6 +303,7 @@ void XAudio2SoundDriver::SetVolume(u32 volume)
 void __stdcall VoiceCallback::OnBufferEnd(void * pBufferContext)
 {
 	UNREFERENCED_PARAMETER(pBufferContext);
+	SetEvent(hBufferEndEvent);
 }
 
 void __stdcall VoiceCallback::OnVoiceProcessingPassStart(UINT32 SamplesRequired) 
