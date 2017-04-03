@@ -51,6 +51,16 @@
 
 #include "my_types.h"
 
+enum SoundDriverType
+{
+	SND_DRIVER_NOSOUND = 0x0000,
+	SND_DRIVER_DS8L = 0x1000,
+	SND_DRIVER_DS8 = 0x1001,
+	SND_DRIVER_XA2L = 0x1002,
+	SND_DRIVER_XA2 = 0x1003,
+};
+
+
 typedef struct {
 	u16 Version;
 	u32 BufferSize;
@@ -88,14 +98,14 @@ unsigned long GenerateCRC (unsigned char *data, int size);
 #endif
 #else
 #ifdef _DEBUG
-#define PLUGIN_DEBUG " (Debug r22)"
+#define PLUGIN_DEBUG " (Debug r23)"
 #else
 #define PLUGIN_DEBUG ""
 #endif
 #endif
 
 #define PLUGIN_RELEASE " v0.70 "
-#define PLUGIN_BUILD "WIP 7" \
+#define PLUGIN_BUILD "WIP 8" \
 	   PLUGIN_DEBUG 
 
 #define PLUGIN_VERSION \

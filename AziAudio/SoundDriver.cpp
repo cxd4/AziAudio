@@ -108,6 +108,7 @@ void SoundDriver::AI_Startup()
 	// to do
 #endif
 	StartAudio();
+	SetVolume(Configuration::getVolume());
 }
 
 void SoundDriver::AI_Shutdown()
@@ -139,6 +140,7 @@ void SoundDriver::AI_ResetAudio()
 
 void SoundDriver::AI_Update(Boolean Wait)
 {
+	Sleep(10); // TODO:  Fixme -- Ai Update appears to be problematic
 	AiUpdate(Wait);
 }
 

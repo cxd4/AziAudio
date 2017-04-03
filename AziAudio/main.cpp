@@ -30,14 +30,9 @@
 
 SoundDriverInterface *snd = NULL;
 
-// DirectSound selection
-#ifdef _WIN32
-LPGUID DSoundGUID[10];
-#endif
-
 bool bLockAddrRegister = false;
 u32 LockAddrRegisterValue = 0;
-
+bool bBackendChanged = false;
 
 #ifdef USE_PRINTF
   void RedirectIOToConsole();
@@ -73,7 +68,12 @@ EXPORT void CALL DllAbout(HWND hParent) {
 EXPORT void CALL DllConfig(HWND hParent)
 {
 #if defined(_WIN32) && !defined(_XBOX)
+	SoundDriverType currentDriver = Configuration::getDriver();
 	Configuration::ConfigDialog(hParent);
+	if (currentDriver != Configuration::getDriver())
+	{
+		bBackendChanged = true;
+	}
 #else
 	fputs("To do:  Implement saving configuration settings.\n", stderr);
 #endif
@@ -100,17 +100,12 @@ EXPORT Boolean CALL InitiateAudio(AUDIO_INFO Audio_Info) {
 		delete snd;
 	}
 
-	snd = SoundDriverFactory::CreateSoundDriver(SoundDriverType::SND_DRIVER_XA2L);
-
 #ifdef USE_PRINTF
 	RedirectIOToConsole();
 	DEBUG_OUTPUT("Logging to console enabled...\n");
 #endif
 	Dacrate = 0;
 	//CloseDLL ();
-//	if ( (DirectSoundEnumerate(DSEnumProc, NULL)) != DS_OK ) { printf("Unable to enumerate DirectSound devices\n"); }
-
-	//Configuration::configDevice = 0;
 
 	memcpy(&AudioInfo, &Audio_Info, sizeof(AUDIO_INFO));
 	DRAM = Audio_Info.RDRAM;
@@ -118,6 +113,10 @@ EXPORT Boolean CALL InitiateAudio(AUDIO_INFO Audio_Info) {
 	IMEM = Audio_Info.IMEM;
 
 	Configuration::LoadDefaults();
+	snd = SoundDriverFactory::CreateSoundDriver(Configuration::getDriver());
+
+	if (snd == NULL)
+		return FALSE;
 
 	snd->AI_Startup();
 	bLockAddrRegister = false;
@@ -165,8 +164,18 @@ EXPORT void CALL RomClosed(void)
 	Dacrate = 0; // Forces a revisit to initialize audio
 	if (snd == NULL)
 		return;
-	//snd->StopAudio();
-	snd->AI_ResetAudio();
+	if (bBackendChanged == true)
+	{
+		snd->AI_Shutdown();
+		delete snd;
+		snd = SoundDriverFactory::CreateSoundDriver(Configuration::getDriver());
+		snd->AI_Startup();
+		bBackendChanged = false;
+	}
+	else
+	{
+		snd->AI_ResetAudio();
+	}
 }
 
 EXPORT void CALL AiDacrateChanged(int SystemType) {

@@ -16,7 +16,7 @@
 //#include "WaveOut.h"
 #include "SoundDriverFactory.h"
 
-static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_DS8L, DirectSoundDriverLegacy::CreateSoundDriver);
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_DS8L, DirectSoundDriverLegacy::CreateSoundDriver, "DirectSound 8 Legacy Driver", 5);
 
 // TODO: Clean this up a bit...
 
@@ -146,7 +146,8 @@ DWORD WINAPI AudioThreadProc(DirectSoundDriverLegacy *ac) {
 				ExitThread(~0u);
 			// Check to see if the audio pointer moved on to the next segment
 			if (write_pos == last_pos) {
-				Sleep (1);
+				if (Configuration::getDisallowSleepDS8() == false)
+					Sleep(1);
 			}
 			WaitForSingleObject(ac->hMutex, INFINITE);
 			if FAILED(lpdsbuff->GetCurrentPosition((unsigned long*)&play_pos, NULL)) {
@@ -378,7 +379,7 @@ BOOL DirectSoundDriverLegacy::Initialize() {
 	HRESULT             hr;
 
 	DeInitialize(); // Release just in case...
-	//SampleRate = 0; // -- Disabled due to reset bug
+	SampleRate = 0; // -- Disabled due to reset bug
 
 	DEBUG_OUTPUT("DS8L: Initialize()\n");
 	hMutex = CreateMutex(NULL, FALSE, NULL);

@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "common.h"
+#include "common.h"
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -11,6 +11,8 @@ protected:
 	static const int MAX_FOLDER_LENGTH = 500;
 	static const int MAX_DEVICE_LENGTH = 100;
 	static INT_PTR CALLBACK ConfigProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+	static INT_PTR CALLBACK AdvancedProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK SettingsProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void LoadSettings();
 	static void SaveSettings();
 	static bool configAIEmulation;
@@ -18,12 +20,15 @@ protected:
 	static bool configForceSync;
 	static unsigned long configVolume;
 	static char configAudioLogFolder[MAX_FOLDER_LENGTH];
-	static char configDevice[MAX_DEVICE_LENGTH];
+	//static LPGUID configDevice;
+	static SoundDriverType configDriver;
 	static unsigned long configFrequency;
 	static unsigned long configBitRate;
 	static unsigned long configBufferLevel; // 1-9
 	static unsigned long configBufferFPS;
 	static unsigned long configBackendFPS;
+	static bool configDisallowSleepXA2;
+	static bool configDisallowSleepDS8;
 
 public:
 	static void LoadDefaults();
@@ -41,15 +46,16 @@ public:
 		strcpy(retVal, configAudioLogFolder);
 		return retVal;
 	}
-	static char* getDevice() {
-		static char retVal[MAX_DEVICE_LENGTH];
-		strcpy(retVal, configDevice);
-		return retVal;
-	}
+#if 0 /* Disable Device Configuration */
+	static LPGUID getDevice() { return configDevice; }
+#endif
+	static SoundDriverType getDriver() { return configDriver; }
 	static unsigned long getFrequency() { return configFrequency; }
 	static unsigned long getBitRate() { return configBitRate; }
 	static unsigned long getBufferLevel() { return configBufferLevel; }
 	static unsigned long getBufferFPS() { return configBufferFPS; }
 	static unsigned long getBackendFPS() { return configBackendFPS; }
+	static bool getDisallowSleepXA2() { return configDisallowSleepXA2; };
+	static bool getDisallowSleepDS8() { return configDisallowSleepDS8; };
 
 };

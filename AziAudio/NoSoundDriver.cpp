@@ -4,7 +4,7 @@
 #include "NoSoundDriver.h"
 #include "SoundDriverFactory.h"
 
-static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_NOSOUND, NoSoundDriver::CreateSoundDriver);
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_NOSOUND, NoSoundDriver::CreateSoundDriver, "No Sound Driver", 0);
 
 Boolean NoSoundDriver::Initialize()
 {
@@ -88,6 +88,7 @@ void NoSoundDriver::StartAudio()
 void NoSoundDriver::SetFrequency(u32 Frequency)
 {
 #ifdef _WIN32
+	UNREFERENCED_PARAMETER(Frequency);
 	//int SamplesPerSecond = Frequency; // 16 bit * stereo
 
 	// Must determine the number of Counter units per Sample
