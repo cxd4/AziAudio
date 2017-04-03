@@ -30,11 +30,6 @@
 
 SoundDriverInterface *snd = NULL;
 
-// DirectSound selection
-#ifdef _WIN32
-LPGUID DSoundGUID[10];
-#endif
-
 bool bLockAddrRegister = false;
 u32 LockAddrRegisterValue = 0;
 
@@ -108,9 +103,6 @@ EXPORT Boolean CALL InitiateAudio(AUDIO_INFO Audio_Info) {
 #endif
 	Dacrate = 0;
 	//CloseDLL ();
-//	if ( (DirectSoundEnumerate(DSEnumProc, NULL)) != DS_OK ) { printf("Unable to enumerate DirectSound devices\n"); }
-
-	//Configuration::configDevice = 0;
 
 	memcpy(&AudioInfo, &Audio_Info, sizeof(AUDIO_INFO));
 	DRAM = Audio_Info.RDRAM;

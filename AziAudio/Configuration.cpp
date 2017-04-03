@@ -1,6 +1,6 @@
 #include "Configuration.h"
 #include "common.h"
-#include <Windows.h>
+#include "DirectSoundDriver.h"
 #include <stdio.h>
 #include "resource.h"
 #include "SoundDriverInterface.h"
@@ -36,6 +36,10 @@ unsigned long Configuration::configBackendFPS;
 static char DSoundDeviceName[10][100];
 static int DSoundCnt;
 static int SelectedDSound;
+// DirectSound selection
+#ifdef _WIN32
+LPGUID DSoundGUID[10];
+#endif
 
 const char *ConfigFile = "Config/AziCfg.bin";
 
@@ -44,9 +48,12 @@ const char *ConfigFile = "Config/AziCfg.bin";
 INT_PTR CALLBACK ConfigProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
 
-
+BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext);
 void Configuration::LoadSettings()
 {
+	if ((DirectSoundEnumerate(DSEnumProc, NULL)) != DS_OK) { printf("Unable to enumerate DirectSound devices\n"); }
+	//Configuration::configDevice = 0;
+
 	size_t file_size;
 	unsigned char azicfg[4];
 	FILE *file;
@@ -115,9 +122,49 @@ void Configuration::LoadDefaults()
 	LoadSettings();	
 }
 #ifdef _WIN32
+#pragma comment(lib, "comctl32.lib")
+extern HINSTANCE hInstance;
 void Configuration::ConfigDialog(HWND hParent)
 {
-	DialogBox(hInstance, MAKEINTRESOURCE(IDD_CONFIG), hParent, ConfigProc);
+	//DialogBox(hInstance, MAKEINTRESOURCE(IDD_CONFIG), hParent, ConfigProc);
+	//return;
+	PROPSHEETHEADER psh;
+	PROPSHEETPAGE psp[2];
+	
+	memset(psp, 0, sizeof(psp));
+	psp[0].dwSize = sizeof(PROPSHEETPAGE);
+	psp[0].dwFlags = PSP_USEICONID | PSP_USETITLE;
+	psp[0].hInstance = hInstance;
+	psp[0].pszTemplate = MAKEINTRESOURCE(IDD_PROPPAGE_GENERAL);
+	//psp[0].pszIcon = MAKEINTRESOURCE(IDI_FONT);
+	psp[0].pfnDlgProc = ConfigProc;// FontDialogProc;
+	psp[0].pszTitle = "Settings";// MAKEINTRESOURCE(IDS_FONT)
+	psp[0].lParam = 0;
+	psp[0].pfnCallback = NULL;
+
+	psp[1].dwSize = sizeof(PROPSHEETPAGE);
+	psp[1].dwFlags = PSP_USEICONID | PSP_USETITLE;
+	psp[1].hInstance = hInstance;
+	psp[1].pszTemplate = MAKEINTRESOURCE(IDD_PROPPAGE_ADVANCED);
+	//psp[0].pszIcon = MAKEINTRESOURCE(IDI_FONT);
+	psp[1].pfnDlgProc = ConfigProc;// FontDialogProc;
+	psp[1].pszTitle = "Advanced";// MAKEINTRESOURCE(IDS_FONT)
+	psp[1].lParam = 0;
+	psp[1].pfnCallback = NULL;
+
+	memset(&psh, 0, sizeof(PROPSHEETHEADER));
+	psh.dwSize = sizeof(PROPSHEETHEADER);
+	psh.dwFlags = PSH_PROPSHEETPAGE;
+	psh.hwndParent = hParent;
+	psh.hInstance = hInstance;
+	psh.pszCaption = "Audio Options";
+	psh.nPages = sizeof(psp) / sizeof(PROPSHEETPAGE);
+	psh.nStartPage = 0;
+	psh.ppsp = (LPCPROPSHEETPAGE)&psp;
+	psh.pfnCallback = NULL;
+
+	PropertySheet(&psh);
+
 }
 void Configuration::AboutDialog(HWND hParent)
 {
@@ -133,7 +180,7 @@ void Configuration::AboutDialog(HWND hParent)
 }
 #endif
 
-#if 0
+#if 1
 // TODO: I think this can safely be removed
 #ifdef _WIN32
 BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext)
@@ -143,10 +190,10 @@ BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, L
 	//HWND hDlg = (HWND)lpContext;
 	safe_strcpy(DSoundDeviceName[DSoundCnt], 99, lpszDesc);
 	DSoundGUID[DSoundCnt] = lpGUID;
-	if (strcmp(lpszDesc, Configuration::configDevice) == 0)
+/*	if (strcmp(lpszDesc, Configuration::configDevice) == 0)
 	{
 		SelectedDSound = DSoundCnt;
-	}
+	}*/
 	DSoundCnt++;
 
 	return TRUE;
