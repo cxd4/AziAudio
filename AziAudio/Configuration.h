@@ -18,7 +18,7 @@ protected:
 	static bool configForceSync;
 	static unsigned long configVolume;
 	static char configAudioLogFolder[MAX_FOLDER_LENGTH];
-	static char configDevice[MAX_DEVICE_LENGTH];
+	static GUID configDevice;
 	static unsigned long configFrequency;
 	static unsigned long configBitRate;
 	static unsigned long configBufferLevel; // 1-9
@@ -43,10 +43,8 @@ public:
 		strcpy(retVal, configAudioLogFolder);
 		return retVal;
 	}
-	static char* getDevice() {
-		static char retVal[MAX_DEVICE_LENGTH];
-		strcpy(retVal, configDevice);
-		return retVal;
+	static LPGUID getDevice() {
+		return &configDevice;
 	}
 	static unsigned long getFrequency() { return configFrequency; }
 	static unsigned long getBitRate() { return configBitRate; }

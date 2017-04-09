@@ -15,7 +15,7 @@ bool Configuration::configSyncAudio;
 bool Configuration::configForceSync;
 unsigned long Configuration::configVolume;
 char Configuration::configAudioLogFolder[500];
-char Configuration::configDevice[100];
+GUID Configuration::configDevice;
 
 // Host SampleRate / BitRate - Seems to help Frank #188
 unsigned long Configuration::configFrequency;
@@ -38,12 +38,12 @@ bool Configuration::configDisallowSleepDS8;
 // ************* File-scope private Variables *************
 
 // Todo: Remove -- these need to be reconsidered
-static char DSoundDeviceName[10][100];
-static int DSoundCnt;
-static int SelectedDSound;
+//static int SelectedDSound;
 // DirectSound selection
 #ifdef _WIN32
-LPGUID DSoundGUID[10];
+static GUID EnumDeviceGUID[10];
+static char EnumDeviceName[20][100];
+static int EnumDeviceCount;
 #endif
 
 const char *ConfigFile = "Config/AziCfg.bin";
@@ -65,10 +65,6 @@ void Configuration::LoadSettings()
 	file = fopen(ConfigFile, "rb");
 	if (file == NULL)
 	{
-		Configuration::configSyncAudio = true;
-		Configuration::configForceSync = false;
-		Configuration::configAIEmulation = true;
-		Configuration::configVolume = 0; /* 0:  max volume; 100:  min volume */
 		SaveSettings(); // Saves the config file with defaults
 	}
 	else
@@ -107,20 +103,22 @@ void Configuration::SaveSettings()
 */
 void Configuration::LoadDefaults()
 {
-	DSoundCnt = 0;
-	SelectedDSound = 0;
+	EnumDeviceCount = 0;
 
 	safe_strcpy(Configuration::configAudioLogFolder, 499, "D:\\");
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS) && !defined(_XBOX)
 	strcpy_s(Configuration::configAudioLogFolder, 500, "D:\\");
-	strcpy_s(Configuration::configDevice, 100, "");
 #else
 	strcpy(Configuration::configAudioLogFolder, "D:\\");
-	strcpy(Configuration::configDevice, "");
 #endif
+	memset(&Configuration::configDevice, 0, sizeof(GUID));
 	// TODO: Query the system and get defaults (windows only?)
-	configFrequency = 48000; // Not implemented -- needs testing
-	configBitRate   = 24;    // Not implemented -- needs testing
+	Configuration::configSyncAudio = true;
+	Configuration::configForceSync = false;
+	Configuration::configAIEmulation = true;
+	Configuration::configVolume = 0; /* 0:  max volume; 100:  min volume */
+	configFrequency = 44100; // Not implemented -- needs testing
+	configBitRate   = 16;    // Not implemented -- needs testing
 	configBufferLevel = 2;  // NewAudio only - How many frames to buffer
 	configBufferFPS = 90;   // NewAudio only - How much data to frame per second
 	configBackendFPS = 90;  // NewAudio only - How much data to frame per second
@@ -194,15 +192,19 @@ BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, L
 {
 	UNREFERENCED_PARAMETER(lpszDrvName);
 	UNREFERENCED_PARAMETER(lpContext);
-	//HWND hDlg = (HWND)lpContext;
-	safe_strcpy(DSoundDeviceName[DSoundCnt], 99, lpszDesc);
-	DSoundGUID[DSoundCnt] = lpGUID;
-/*	if (strcmp(lpszDesc, Configuration::configDevice) == 0)
+	GUID test;
+	memset(&test, 0, sizeof(GUID));
+	if (lpGUID == NULL)
 	{
-		SelectedDSound = DSoundCnt;
-	}*/
-	DSoundCnt++;
-
+		safe_strcpy(EnumDeviceName[EnumDeviceCount], 99, "Default");
+		EnumDeviceGUID[EnumDeviceCount] = NULL;
+	}
+	else
+	{
+		safe_strcpy(EnumDeviceName[EnumDeviceCount], 99, lpszDesc);
+		memcpy(&EnumDeviceGUID[EnumDeviceCount], lpGUID, sizeof(GUID));
+	}
+	EnumDeviceCount++;
 	return TRUE;
 }
 #endif
@@ -220,10 +222,11 @@ INT_PTR CALLBACK Configuration::ConfigProc(
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_RESETCONTENT, 0, 0);
-		for (x = 0; x < DSoundCnt; x++) {
-			SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_ADDSTRING, 0, (long)DSoundDeviceName[x]);
+		for (x = 0; x < EnumDeviceCount; x++) {
+			SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_ADDSTRING, 0, (long)EnumDeviceName[x]);
+			if (memcmp(&EnumDeviceGUID, &configDevice, sizeof(GUID)) == 0)
+				SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_SETCURSEL, x, 0);
 		}
-		SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_SETCURSEL, SelectedDSound, 0);
 		SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_SETCHECK, Configuration::configForceSync ? BST_CHECKED : BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_SETCHECK, Configuration::configSyncAudio ? BST_CHECKED : BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(hDlg, IDC_AI), BM_SETCHECK, Configuration::configAIEmulation ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -246,8 +249,8 @@ INT_PTR CALLBACK Configuration::ConfigProc(
 			Configuration::configForceSync = SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
 			Configuration::configSyncAudio = SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
 			Configuration::configAIEmulation = SendMessage(GetDlgItem(hDlg, IDC_AI), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
-			SelectedDSound = (int)SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_GETCURSEL, 0, 0);
-			safe_strcpy(Configuration::configDevice, 99, DSoundDeviceName[SelectedDSound]);
+			x = (int)SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_GETCURSEL, 0, 0);  // TODO: need to save and switch devices
+			memcpy(&Configuration::configDevice, &EnumDeviceGUID[x], sizeof(GUID));
 			Configuration::configVolume = SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_GETPOS, 0, 0);
 			snd->SetVolume(Configuration::configVolume);
 
