@@ -88,6 +88,7 @@ void NoSoundDriver::StartAudio()
 void NoSoundDriver::SetFrequency(u32 Frequency)
 {
 #ifdef _WIN32
+	UNREFERENCED_PARAMETER(Frequency);
 	//int SamplesPerSecond = Frequency; // 16 bit * stereo
 
 	// Must determine the number of Counter units per Sample

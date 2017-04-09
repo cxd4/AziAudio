@@ -232,12 +232,14 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 				}
 				else
 				{
-					Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
+					if (Configuration::getDisallowSleepXA2 == false) 
+						Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
 				}
 				g_source->GetState(&xvs);
 			}
 		}
-		Sleep(1);
+		if (Configuration::getDisallowSleepXA2 == false)
+			Sleep(1);
 	}
 	return 0;
 }

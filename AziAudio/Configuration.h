@@ -24,6 +24,8 @@ protected:
 	static unsigned long configBufferLevel; // 1-9
 	static unsigned long configBufferFPS;
 	static unsigned long configBackendFPS;
+	static bool configDisallowSleepXA2;
+	static bool configDisallowSleepDS8;
 
 public:
 	static void LoadDefaults();
@@ -51,5 +53,7 @@ public:
 	static unsigned long getBufferLevel() { return configBufferLevel; }
 	static unsigned long getBufferFPS() { return configBufferFPS; }
 	static unsigned long getBackendFPS() { return configBackendFPS; }
+	static bool getDisallowSleepXA2() { return configDisallowSleepXA2; };
+	static bool getDisallowSleepDS8() { return configDisallowSleepDS8; };
 
 };

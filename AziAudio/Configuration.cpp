@@ -26,6 +26,11 @@ unsigned long Configuration::configBufferLevel;
 unsigned long Configuration::configBufferFPS;
 unsigned long Configuration::configBackendFPS;
 
+// Prevent various sleep states from taking place
+bool Configuration::configDisallowSleepXA2;
+bool Configuration::configDisallowSleepDS8;
+
+
 // Todo: Setting to identify which output device is used
 
 // Todo: Setting to identify which audio backend is being used
@@ -119,7 +124,9 @@ void Configuration::LoadDefaults()
 	configBufferLevel = 2;  // NewAudio only - How many frames to buffer
 	configBufferFPS = 90;   // NewAudio only - How much data to frame per second
 	configBackendFPS = 90;  // NewAudio only - How much data to frame per second
-	LoadSettings();	
+	configDisallowSleepXA2 = false;
+	configDisallowSleepDS8 = false;
+	LoadSettings();
 }
 #ifdef _WIN32
 #pragma comment(lib, "comctl32.lib")
