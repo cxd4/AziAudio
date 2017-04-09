@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "common.h"
+#include "common.h"
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -18,7 +18,8 @@ protected:
 	static bool configForceSync;
 	static unsigned long configVolume;
 	static char configAudioLogFolder[MAX_FOLDER_LENGTH];
-	static GUID configDevice;
+	static LPGUID configDevice;
+	static SoundDriverType configDriver;
 	static unsigned long configFrequency;
 	static unsigned long configBitRate;
 	static unsigned long configBufferLevel; // 1-9
@@ -43,9 +44,8 @@ public:
 		strcpy(retVal, configAudioLogFolder);
 		return retVal;
 	}
-	static LPGUID getDevice() {
-		return &configDevice;
-	}
+	static LPGUID getDevice() {	return configDevice; }
+	static SoundDriverType getDriver() { return configDriver; }
 	static unsigned long getFrequency() { return configFrequency; }
 	static unsigned long getBitRate() { return configBitRate; }
 	static unsigned long getBufferLevel() { return configBufferLevel; }

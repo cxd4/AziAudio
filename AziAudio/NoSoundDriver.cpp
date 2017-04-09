@@ -4,7 +4,7 @@
 #include "NoSoundDriver.h"
 #include "SoundDriverFactory.h"
 
-static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_NOSOUND, NoSoundDriver::CreateSoundDriver);
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_NOSOUND, NoSoundDriver::CreateSoundDriver, "No Sound Driver", 0);
 
 Boolean NoSoundDriver::Initialize()
 {
