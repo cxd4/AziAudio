@@ -1,9 +1,13 @@
 #include "Configuration.h"
 #include "common.h"
-#include <Windows.h>
+
 #include <stdio.h>
 #include "resource.h"
 #include "SoundDriverInterface.h"
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 extern HINSTANCE hInstance; // DLL's HINSTANCE
 extern SoundDriverInterface *snd;
