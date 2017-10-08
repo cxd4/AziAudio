@@ -5,6 +5,9 @@
 #include <Windows.h>
 #endif
 
+/* strcpy() */
+#include <string.h>
+
 class Configuration
 {
 protected:
