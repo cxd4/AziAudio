@@ -7,9 +7,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
+extern HINSTANCE hInstance; // DLL's HINSTANCE
 #endif
 
-extern HINSTANCE hInstance; // DLL's HINSTANCE
 extern SoundDriverInterface *snd;
 
 // ************* Member Variables *************

@@ -13,7 +13,9 @@ class Configuration
 protected:
 	static const int MAX_FOLDER_LENGTH = 500;
 	static const int MAX_DEVICE_LENGTH = 100;
+#ifdef _WIN32
 	static INT_PTR CALLBACK ConfigProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+#endif
 	static void LoadSettings();
 	static void SaveSettings();
 	static bool configAIEmulation;
