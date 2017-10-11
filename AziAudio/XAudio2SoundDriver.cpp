@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include "SoundDriverFactory.h"
 
-static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2, XAudio2SoundDriver::CreateSoundDriver);
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2, XAudio2SoundDriver::CreateSoundDriver, "XAudio2 Driver", 15);
 
 static IXAudio2* g_engine;
 static IXAudio2SourceVoice* g_source;
@@ -232,12 +232,14 @@ DWORD WINAPI XAudio2SoundDriver::AudioThreadProc(LPVOID lpParameter)
 				}
 				else
 				{
-					Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
+					if (Configuration::getDisallowSleepXA2() == false) 
+						Sleep(0); // Give up timeslice - prevents a 2ms sleep potential
 				}
 				g_source->GetState(&xvs);
 			}
 		}
-		Sleep(1);
+		if (Configuration::getDisallowSleepXA2() == false)
+			Sleep(1);
 	}
 	return 0;
 }

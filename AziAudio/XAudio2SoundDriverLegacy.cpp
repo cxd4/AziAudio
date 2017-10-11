@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include "SoundDriverFactory.h"
 
-static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2L, XAudio2SoundDriverLegacy::CreateSoundDriver);
+static bool ClassRegistered = SoundDriverFactory::RegisterSoundDriver(SND_DRIVER_XA2L, XAudio2SoundDriverLegacy::CreateSoundDriver, "XAudio2 Legacy Driver", 11);
 
 static IXAudio2* g_engine;
 static IXAudio2SourceVoice* g_source;
