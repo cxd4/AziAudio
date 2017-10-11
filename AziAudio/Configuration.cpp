@@ -81,7 +81,7 @@ void Configuration::LoadSettings()
 	unsigned char azicfg[256];
 	FILE *file;
 	file = fopen(ConfigFile, "rb");
-	memset(azicfg, 0, 256);
+	memset(azicfg, 0, sizeof(azicfg));
 	if (file == NULL)
 	{
 		SaveSettings(); // Saves the config file with defaults
