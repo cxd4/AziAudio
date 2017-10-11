@@ -8,7 +8,7 @@
 *                                                                           *
 * GNU/GPLv2 http://www.gnu.org/licenses/gpl-2.0.html                        *
 *                                                                           *
-*   Mupen64plus-rsp-hle - musyx.c                                           *
+*   Mupen64plus-rsp-hle - audio.c                                           *
 *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/             *
 *   Copyright (C) 2013 Bobby Smiles                                         *
 *                                                                           *
