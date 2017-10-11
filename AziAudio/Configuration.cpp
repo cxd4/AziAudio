@@ -7,7 +7,11 @@
 #include "SoundDriverFactory.h"
 
 
+#ifdef _WIN32
+#include <windows.h>
 extern HINSTANCE hInstance; // DLL's HINSTANCE
+#endif
+
 extern SoundDriverInterface *snd;
 
 // ************* Member Variables *************

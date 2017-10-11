@@ -53,6 +53,7 @@ dlldata.c
 *_i.c
 *_p.c
 *_i.h
+*.idb
 *.ilk
 *.meta
 *.obj
@@ -60,6 +61,7 @@ dlldata.c
 *.pdb
 *.pgc
 *.pgd
+*.res
 *.rsp
 *.sbr
 *.tlb
